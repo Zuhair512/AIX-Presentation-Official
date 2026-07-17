@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AIX Disaster Recovery — Team Presentation</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #1a1a1a; padding-bottom: 60px; }
+
+.deck { width: 100%; }
+
+/* ── each slide is a full viewport-height section ── */
+.slide {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 100px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* slide number badge */
+.slide-num {
+  position: absolute;
+  top: 24px;
+  right: 36px;
+  color: rgba(255,255,255,0.2);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+.slide-num.dark { color: rgba(0,0,0,0.2); }
+
+/* ─────────────────────────────────
+   SLIDE 1 — COVER
+───────────────────────────────── */
+#s1 {
+  background: #161616;
+  justify-content: flex-end;
+  padding-bottom: 80px;
+}
+#s1 .bar  { position:absolute;top:0;left:0;width:6px;height:100%;background:#0f62fe; }
+#s1 .grid { position:absolute;top:0;right:0;width:50%;height:100%;
+  background-image:linear-gradient(rgba(15,98,254,.07)1px,transparent 1px),linear-gradient(90deg,rgba(15,98,254,.07)1px,transparent 1px);
+  background-size:48px 48px; }
+#s1 .bigtext { position:absolute;top:40px;right:60px;font-size:260px;font-weight:700;
+  color:rgba(255,255,255,.03);letter-spacing:-10px;line-height:1;user-select:none; }
+#s1 .eyebrow { display:flex;align-items:center;gap:12px;margin-bottom:28px; }
+#s1 .eyebrow .line { width:36px;height:2px;background:#0f62fe; }
+#s1 .eyebrow span { color:#0f62fe;font-size:13px;font-weight:700;letter-spacing:.15em;text-transform:uppercase; }
+#s1 h1 { font-size:62px;font-weight:300;color:#fff;line-height:1.1;margin-bottom:8px; }
+#s1 h2 { font-size:62px;font-weight:700;color:#fff;line-height:1.1;margin-bottom:36px; }
+#s1 .divider { width:72px;height:4px;background:#0f62fe;margin-bottom:36px; }
+#s1 .meta { display:flex;gap:48px; }
+#s1 .meta-item label { display:block;color:rgba(255,255,255,.45);font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px; }
+#s1 .meta-item span  { color:#fff;font-size:16px;font-weight:500; }
+
+/* ─────────────────────────────────
+   SLIDE 2 — WHY
+───────────────────────────────── */
+#s2 { background:#fff; padding:0; flex-direction:row; }
+#s2 .left {
+  width:400px; min-height:100vh; background:#161616;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:60px 48px; position:relative; flex-shrink:0;
+}
+#s2 .left .bar { position:absolute;top:0;left:0;width:4px;height:100%;background:#0f62fe; }
+#s2 .left .ey  { color:#0f62fe;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:20px; }
+#s2 .left h2   { font-size:38px;font-weight:300;color:#fff;line-height:1.2;margin-bottom:10px; }
+#s2 .left h3   { font-size:38px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:28px; }
+#s2 .left .div { width:40px;height:2px;background:#0f62fe;margin-bottom:28px; }
+#s2 .left p    { color:rgba(255,255,255,.65);font-size:14px;line-height:1.8; }
+#s2 .right { flex:1;padding:60px 64px;display:flex;flex-direction:column;justify-content:center; }
+#s2 .right .lbl { font-size:12px;font-weight:700;color:#0f62fe;letter-spacing:.12em;text-transform:uppercase;margin-bottom:28px; }
+#s2 .card {
+  display:flex;gap:18px;align-items:flex-start;
+  padding:18px 20px;margin-bottom:14px;
+  background:#f4f4f4;border-radius:2px;border-left:4px solid #0f62fe;
+}
+#s2 .card .ico { font-size:24px;margin-top:2px; }
+#s2 .card h4   { font-size:15px;font-weight:700;color:#161616;margin-bottom:5px; }
+#s2 .card p    { font-size:13px;color:#393939;line-height:1.6; }
+
+/* ─────────────────────────────────
+   SLIDE 3 — INFRASTRUCTURE
+───────────────────────────────── */
+#s3 { background:#f4f4f4; }
+#s3 .ey    { font-size:11px;font-weight:700;color:#0f62fe;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px; }
+#s3 h2     { font-size:36px;font-weight:700;color:#161616;margin-bottom:8px; }
+#s3 .div   { width:52px;height:3px;background:#0f62fe;margin-bottom:40px; }
+#s3 .row   { display:flex;gap:20px;align-items:stretch; }
+
+#s3 .nim-box {
+  width:280px;background:#161616;border-radius:4px;padding:32px 28px;
+  display:flex;flex-direction:column;flex-shrink:0;
+}
+#s3 .nim-box .ico-wrap { width:52px;height:52px;background:#0f62fe;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:18px; }
+#s3 .nim-box .ey2 { color:#0f62fe;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px; }
+#s3 .nim-box h4   { color:#fff;font-size:20px;font-weight:700;margin-bottom:6px; }
+#s3 .nim-box .sub { color:rgba(255,255,255,.5);font-size:13px;margin-bottom:20px; }
+#s3 .nim-box ul   { list-style:none;margin-top:auto; }
+#s3 .nim-box li   { display:flex;align-items:center;gap:10px;margin-bottom:10px;color:rgba(255,255,255,.75);font-size:13px; }
+#s3 .nim-box li::before { content:'';width:7px;height:7px;border-radius:50%;background:#0f62fe;flex-shrink:0; }
+
+#s3 .arr { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:0 8px; }
+#s3 .arr .sym { color:#0f62fe;font-size:30px; }
+#s3 .arr .txt { font-size:10px;color:#393939;text-align:center;line-height:1.4; }
+
+#s3 .clients { flex:1;display:flex;flex-direction:column;gap:12px; }
+#s3 .clients .clbl { font-size:11px;font-weight:700;color:#393939;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px; }
+#s3 .client-row {
+  background:#fff;border-radius:2px;padding:14px 20px;
+  display:flex;align-items:center;gap:16px;border:1px solid #e0e0e0;flex:1;
+}
+#s3 .client-row .ci { width:38px;height:38px;background:#f4f4f4;border-radius:2px;
+  display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid #e0e0e0; }
+#s3 .client-row .cn { font-size:14px;font-weight:700;color:#161616; }
+#s3 .client-row .cs { font-size:12px;color:#393939;margin-top:2px; }
+#s3 .client-row .badge { margin-left:auto;background:#defbe6;color:#0e6027;
+  border-radius:2px;padding:4px 12px;font-size:11px;font-weight:700; }
+
+#s3 .gsa-box {
+  width:150px;background:#fff;border-radius:2px;padding:24px 18px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;border:1px dashed #c6c6c6;flex-shrink:0;
+}
+#s3 .gsa-box .gi  { font-size:32px;margin-bottom:12px; }
+#s3 .gsa-box h4   { font-size:13px;font-weight:700;color:#161616;margin-bottom:8px; }
+#s3 .gsa-box p    { font-size:11px;color:#393939;line-height:1.5; }
+
+/* ─────────────────────────────────
+   SLIDE 4 — BACKUP
+───────────────────────────────── */
+#s4 { background:#fff; }
+#s4 .ey  { font-size:11px;font-weight:700;color:#0f62fe;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px; }
+#s4 h2   { font-size:36px;font-weight:700;color:#161616;margin-bottom:8px; }
+#s4 .div { width:52px;height:3px;background:#0f62fe;margin-bottom:36px; }
+#s4 .cols { display:flex;gap:28px; }
+
+#s4 .col-l { flex:1;display:flex;flex-direction:column;gap:16px; }
+#s4 .col-l .clbl { font-size:11px;font-weight:700;color:#393939;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px; }
+
+#s4 .mksysb { background:#161616;border-radius:4px;padding:24px 26px; }
+#s4 .mksysb .bey { color:#0f62fe;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px; }
+#s4 .mksysb h4   { color:#fff;font-size:17px;font-weight:700;margin-bottom:10px; }
+#s4 .mksysb p    { color:rgba(255,255,255,.65);font-size:13px;line-height:1.7;margin-bottom:14px; }
+#s4 .mksysb .tags{ display:flex;gap:10px; }
+#s4 .t-blue { background:rgba(15,98,254,.25);border-radius:2px;padding:4px 14px;font-size:11px;color:#4589ff;font-weight:700; }
+#s4 .t-dim  { background:rgba(255,255,255,.1);border-radius:2px;padding:4px 14px;font-size:11px;color:rgba(255,255,255,.55); }
+
+#s4 .savevg { background:#f4f4f4;border-radius:4px;padding:24px 26px;border:1px solid #e0e0e0; }
+#s4 .savevg .bey { color:#0072c3;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px; }
+#s4 .savevg h4   { color:#161616;font-size:17px;font-weight:700;margin-bottom:10px; }
+#s4 .savevg p    { color:#393939;font-size:13px;line-height:1.7;margin-bottom:14px; }
+#s4 .savevg .tags{ display:flex;gap:10px; }
+#s4 .t-cyan { background:#d0e2ff;border-radius:2px;padding:4px 14px;font-size:11px;color:#0043ce;font-weight:700; }
+#s4 .t-lgray{ background:#e0e0e0;border-radius:2px;padding:4px 14px;font-size:11px;color:#393939; }
+
+#s4 .col-r { flex:1.1;display:flex;flex-direction:column;gap:14px; }
+#s4 .col-r .clbl { font-size:11px;font-weight:700;color:#393939;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px; }
+#s4 .step {
+  display:flex;gap:16px;align-items:flex-start;
+  background:#f4f4f4;border-radius:2px;padding:16px 18px;border:1px solid #e0e0e0;
+}
+#s4 .step .sn {
+  width:32px;height:32px;background:#0f62fe;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:14px;font-weight:700;flex-shrink:0;
+}
+#s4 .step h4 { font-size:14px;font-weight:700;color:#161616;margin-bottom:5px; }
+#s4 .step p  { font-size:12px;color:#393939;line-height:1.6; }
+
+#s4 .retention { background:#001141;border-radius:4px;padding:18px 20px; }
+#s4 .retention .rey { color:#0f62fe;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px; }
+#s4 .weeks { display:flex;gap:10px;margin-bottom:12px; }
+#s4 .wk { flex:1;border-radius:2px;padding:10px 8px;text-align:center; }
+#s4 .wk.on  { background:#0f62fe; }
+#s4 .wk.off { background:rgba(15,98,254,.3); }
+#s4 .wk .wn { color:#fff;font-size:12px;font-weight:700; }
+#s4 .wk .wc { color:rgba(255,255,255,.65);font-size:11px;margin-top:3px; }
+#s4 .retention p { color:rgba(255,255,255,.65);font-size:12px;line-height:1.6; }
+
+/* ─────────────────────────────────
+   SLIDE 5 — RECOVERY
+───────────────────────────────── */
+#s5 { background:#161616;position:relative; }
+#s5 .bar  { position:absolute;top:0;left:0;width:5px;height:100%;background:#0f62fe; }
+#s5 .grid { position:absolute;top:0;right:0;width:40%;height:100%;
+  background-image:linear-gradient(rgba(15,98,254,.04)1px,transparent 1px),linear-gradient(90deg,rgba(15,98,254,.04)1px,transparent 1px);
+  background-size:44px 44px; }
+#s5 .ey  { font-size:11px;font-weight:700;color:#0f62fe;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;position:relative;z-index:2; }
+#s5 h2   { font-size:36px;font-weight:700;color:#fff;margin-bottom:8px;position:relative;z-index:2; }
+#s5 .div { width:52px;height:3px;background:#0f62fe;margin-bottom:40px;position:relative;z-index:2; }
+#s5 .steps { display:flex;gap:16px;position:relative;z-index:2; }
+#s5 .rs {
+  flex:1;background:rgba(255,255,255,.06);border-radius:4px;
+  padding:24px 20px;border-top:3px solid #0f62fe;
+  display:flex;flex-direction:column;
+}
+#s5 .rs.done { border-top-color:#24a148; }
+#s5 .rs .rn  { font-size:32px;font-weight:700;color:rgba(255,255,255,.1);margin-bottom:12px;line-height:1; }
+#s5 .rs h4   { font-size:14px;font-weight:700;color:#fff;margin-bottom:12px;line-height:1.4; }
+#s5 .rs p    { font-size:12px;color:rgba(255,255,255,.6);line-height:1.7;flex:1; }
+#s5 .rs .arrow { margin-top:16px;text-align:right;color:#0f62fe;font-size:18px; }
+#s5 .rs .complete-badge {
+  margin-top:16px;background:rgba(36,161,72,.2);border-radius:2px;
+  padding:6px 10px;text-align:center;color:#42be65;font-size:12px;font-weight:700;
+}
+
+/* ─────────────────────────────────
+   SLIDE 6 — NIM RESOURCES
+───────────────────────────────── */
+#s6 { background:#fff;padding:0;flex-direction:row; }
+#s6 .left {
+  width:380px;min-height:100vh;background:#0f62fe;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:60px 44px;position:relative;overflow:hidden;flex-shrink:0;
+}
+#s6 .left .c1 { position:absolute;bottom:0;right:0;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.07); }
+#s6 .left .c2 { position:absolute;top:40px;right:-70px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.04); }
+#s6 .left .ey { color:rgba(255,255,255,.75);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:22px;position:relative; }
+#s6 .left h2  { font-size:36px;font-weight:300;color:#fff;line-height:1.2;margin-bottom:8px;position:relative; }
+#s6 .left h3  { font-size:36px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:30px;position:relative; }
+#s6 .left .div{ width:44px;height:2px;background:rgba(255,255,255,.4);margin-bottom:28px;position:relative; }
+#s6 .left p   { color:rgba(255,255,255,.75);font-size:14px;line-height:1.8;position:relative; }
+#s6 .right { flex:1;padding:60px 56px;display:flex;flex-direction:column;justify-content:center; }
+#s6 .res {
+  display:flex;gap:20px;align-items:flex-start;
+  padding:20px 22px;margin-bottom:18px;
+  background:#f4f4f4;border-radius:2px;
+}
+#s6 .res.r1 { border-left:5px solid #0f62fe; }
+#s6 .res.r2 { border-left:5px solid #0072c3; }
+#s6 .res.r3 { border-left:5px solid #8a3ffc; }
+#s6 .res .rnum { width:38px;height:38px;border-radius:2px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700;flex-shrink:0; }
+#s6 .res.r1 .rnum { background:#0f62fe; }
+#s6 .res.r2 .rnum { background:#0072c3; }
+#s6 .res.r3 .rnum { background:#8a3ffc; }
+#s6 .res h4  { font-size:15px;font-weight:700;color:#161616;margin-bottom:6px; }
+#s6 .res p   { font-size:13px;color:#393939;line-height:1.6;margin-bottom:6px; }
+#s6 .res .det{ font-size:12px;font-weight:600; }
+#s6 .res.r1 .det { color:#0f62fe; }
+#s6 .res.r2 .det { color:#0072c3; }
+#s6 .res.r3 .det { color:#8a3ffc; }
+
+/* ─────────────────────────────────
+   SLIDE 7 — SUMMARY
+───────────────────────────────── */
+#s7 { background:#f4f4f4; }
+#s7 .ey  { font-size:11px;font-weight:700;color:#0f62fe;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px; }
+#s7 h2   { font-size:36px;font-weight:700;color:#161616;margin-bottom:8px; }
+#s7 .div { width:52px;height:3px;background:#0f62fe;margin-bottom:36px; }
+#s7 .cols { display:flex;gap:24px; }
+#s7 .col-l { flex:1.3;display:flex;flex-direction:column;gap:12px; }
+#s7 .col-l .clbl { font-size:11px;font-weight:700;color:#393939;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px; }
+#s7 .chk {
+  display:flex;gap:14px;align-items:flex-start;
+  background:#fff;border-radius:2px;padding:13px 18px;border:1px solid #e0e0e0;
+}
+#s7 .chk .icon { font-size:16px;flex-shrink:0;margin-top:1px; }
+#s7 .chk span  { font-size:13px;color:#161616;line-height:1.6; }
+#s7 .col-r { flex:1;display:flex;flex-direction:column;gap:16px; }
+#s7 .rto {
+  background:#161616;border-radius:4px;padding:24px 26px;
+}
+#s7 .rto .rey { color:#0f62fe;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px; }
+#s7 .rto .metrics { display:flex;gap:20px; }
+#s7 .rto .m  { flex:1;text-align:center; }
+#s7 .rto .m .big  { font-size:36px;font-weight:700;color:#fff;line-height:1; }
+#s7 .rto .m .sub  { font-size:12px;color:rgba(255,255,255,.5);margin:6px 0 10px; }
+#s7 .rto .m .val  { background:#0f62fe;border-radius:2px;padding:6px 0;font-size:13px;font-weight:700;color:#fff; }
+#s7 .rto-div { width:1px;background:rgba(255,255,255,.1); }
+#s7 .next { background:#fff;border-radius:4px;padding:22px 24px;border:1px solid #e0e0e0; }
+#s7 .next .nlbl { font-size:11px;font-weight:700;color:#393939;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px; }
+#s7 .ni { display:flex;gap:12px;align-items:flex-start;margin-bottom:12px; }
+#s7 .ni .nn {
+  width:22px;height:22px;background:#0f62fe;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;
+}
+#s7 .ni span { font-size:13px;color:#161616;line-height:1.5; }
+
+/* ── nav bar fixed at bottom ── */
+.nav-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(20,20,20,.97);
+  border-top: 1px solid rgba(255,255,255,.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 24px;
+  z-index: 1000;
+}
+.nav-bar a {
+  display: inline-block;
+  padding: 8px 20px;
+  background: rgba(255,255,255,.08);
+  color: rgba(255,255,255,.6);
+  text-decoration: none;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(255,255,255,.12);
+  white-space: nowrap;
+}
+.nav-bar a:hover { background:#0f62fe;color:#fff;border-color:#0f62fe; }
+.nav-bar .sep { color:rgba(255,255,255,.2);font-size:18px; }
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+<!-- ══════════════════════════════════
+     SLIDE 1 — COVER
+══════════════════════════════════ -->
+<section class="slide" id="s1">
+  <div class="bar"></div>
+  <div class="grid"></div>
+  <div class="bigtext">AIX</div>
+  <div class="slide-num">01 / 07</div>
+  <div class="eyebrow"><div class="line"></div><span>IBM AIX Build Team</span></div>
+  <h1>AIX Disaster Recovery</h1>
+  <h2>Plan &amp; Procedures</h2>
+  <div class="divider"></div>
+  <div class="meta">
+    <div class="meta-item"><label>Presented by</label><span>Zuhair Siddiqui &amp; Fouad Farhoud</span></div>
+    <div class="meta-item"><label>Team</label><span>AIX Tools &amp; Builds</span></div>
+    <div class="meta-item"><label>Year</label><span>2025</span></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     SLIDE 2 — WHY
+══════════════════════════════════ -->
+<section class="slide" id="s2">
+  <div class="slide-num dark">02 / 07</div>
+  <div class="left">
+    <div class="bar"></div>
+    <div class="ey">Overview</div>
+    <h2>Why We Need a</h2>
+    <h3>Recovery Plan</h3>
+    <div class="div"></div>
+    <p>Our AIX build servers are critical infrastructure. When they go down, builds stop and work halts. This plan ensures we are always prepared to recover — fast and consistently — no matter what type of disaster occurs.</p>
+  </div>
+  <div class="right">
+    <div class="lbl">Disaster Scenarios We Plan For</div>
+    <div class="card">
+      <div class="ico">⚙️</div>
+      <div>
+        <h4>Hardware Failure</h4>
+        <p>Physical server components — disks, adapters, processors, or memory — may fail, preventing normal operation. Recovery may require hardware repair or restoration to an alternate LPAR before system recovery can begin.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ico">💾</div>
+      <div>
+        <h4>OS Corruption</h4>
+        <p>System files, rootvg corruption, failed updates, or software issues may render the operating system unusable. The affected system can be restored using an existing mksysb image.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ico">🗑️</div>
+      <div>
+        <h4>Accidental Deletion</h4>
+        <p>Critical files, directories, or application data may become corrupted or deleted. Depending on scope, either partial recovery or full system restoration may be required.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ico">🔌</div>
+      <div>
+        <h4>Storage or Site Outage</h4>
+        <p>Power failures, network outages, or environmental incidents may affect multiple systems simultaneously. Recovery must account for both system restoration and supporting services.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     SLIDE 3 — INFRASTRUCTURE
+══════════════════════════════════ -->
+<section class="slide" id="s3">
+  <div class="slide-num dark">03 / 07</div>
+  <div class="ey">Environment</div>
+  <h2>Recovery Infrastructure</h2>
+  <div class="div"></div>
+  <div class="row">
+    <div class="nim-box">
+      <div class="ico-wrap">🖥️</div>
+      <div class="ey2">Control Server</div>
+      <h4>NIM Master</h4>
+      <div class="sub">distbkup2</div>
+      <ul>
+        <li>Stores all backup images centrally</li>
+        <li>Creates mksysb, SPOT &amp; client definition resources</li>
+        <li>Orchestrates network installs during recovery</li>
+        <li>Disk space: confirmed sufficient</li>
+        <li>Does not require root access on client (uses nimsh)</li>
+      </ul>
+    </div>
+    <div class="arr">
+      <div class="sym">⇄</div>
+      <div class="txt">Grover's<br>Script</div>
+    </div>
+    <div class="clients">
+      <div class="clbl">AIX Client Servers (4 Total)</div>
+      <div class="client-row">
+        <div class="ci">💻</div>
+        <div><div class="cn">Client 1 — AIX Build Server</div><div class="cs">Client will use Grover's script to write directly into distbkup2</div></div>
+        <div class="badge">Active</div>
+      </div>
+      <div class="client-row">
+        <div class="ci">💻</div>
+        <div><div class="cn">Client 2 — AIX Build Server</div><div class="cs">Client will use Grover's script to write directly into distbkup2</div></div>
+        <div class="badge">Active</div>
+      </div>
+      <div class="client-row">
+        <div class="ci">💻</div>
+        <div><div class="cn">Client 3 — AIX Build Server</div><div class="cs">Client will use Grover's script to write directly into distbkup2</div></div>
+        <div class="badge">Active</div>
+      </div>
+      <div class="client-row">
+        <div class="ci">💻</div>
+        <div><div class="cn">Client 4 — AIX Build Server</div><div class="cs">Client will use Grover's script to write directly into distbkup2</div></div>
+        <div class="badge">Active</div>
+      </div>
+    </div>
+    <div class="arr">
+      <div class="sym" style="font-size:20px;color:#393939;">→</div>
+      <div class="txt">overflow<br>if needed</div>
+    </div>
+    <div class="gsa-box">
+      <div class="gi">🗄️</div>
+      <h4>GSA Storage</h4>
+      <p>Enterprise storage. Available as overflow if NIM Master disk capacity is ever exceeded.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     SLIDE 4 — BACKUP PROCESS
+══════════════════════════════════ -->
+<section class="slide" id="s4">
+  <div class="slide-num dark">04 / 07</div>
+  <div class="ey">Phase 1</div>
+  <h2>Backup Process</h2>
+  <div class="div"></div>
+  <div class="cols">
+    <div class="col-l">
+      <div class="clbl">Two Types of Backups</div>
+      <div class="mksysb">
+        <div class="bey">mksysb — OS Backup</div>
+        <h4>Root Volume Group (rootvg)</h4>
+        <p>A full snapshot of the operating system — everything the machine needs to boot. rootvg is mostly static and rarely changes, so one monthly backup is sufficient to recover the entire OS to its last known good state.</p>
+        <div class="tags">
+          <div class="t-blue">Once a Month</div>
+          <div class="t-dim">via SMIT on client</div>
+        </div>
+      </div>
+      <div class="savevg">
+        <div class="bey">savevg — Data Backup</div>
+        <h4>Non-Root Volume Groups</h4>
+        <p>Backs up application data, build artifacts, and user files. This data changes constantly with every build cycle, so weekly backups are required to minimize the amount of work that could be lost in a disaster.</p>
+        <div class="tags">
+          <div class="t-cyan">Every Friday Night</div>
+          <div class="t-lgray">via SMIT on client</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-r">
+      <div class="clbl">How Backups Flow to the NIM Master</div>
+      <div class="step">
+        <div class="sn">1</div>
+        <div>
+          <h4>Generate the backup locally on the client</h4>
+          <p>Use Grover's script to create the correct backup and to detect the state of the system.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">2</div>
+        <div>
+          <h4>Use Grover's Script to write to distbkup2 (NIM Master)</h4>
+          <p>Once the backup is created, the client uses Grover's script to write the image file directly into the designated directory on the NIM Master. This is the central backup repository.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">3</div>
+        <div>
+          <h4>NIM Master creates 3 recovery resources</h4>
+          <p>From the uploaded image, NIM Master creates: ① the mksysb resource, ② the SPOT resource (network boot environment), and ③ the NIM Client Definition (MAC address, CPU ID, machine ID).</p>
+        </div>
+      </div>
+      <div class="retention">
+        <div class="rey">Retention Policy — 1 Month Rolling</div>
+        <div class="weeks">
+          <div class="wk on"><div class="wn">Week 1</div><div class="wc">4 images</div></div>
+          <div class="wk on"><div class="wn">Week 2</div><div class="wc">4 images</div></div>
+          <div class="wk on"><div class="wn">Week 3</div><div class="wc">4 images</div></div>
+          <div class="wk on"><div class="wn">Week 4</div><div class="wc">4 images</div></div>
+        </div>
+        <p>Keep the 4 most recent weekly backups per client (1 full month). On Week 5, delete the oldest set before adding the new one. Always monitor NIM Master disk space.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     SLIDE 4B — GROVER'S SCRIPT
+══════════════════════════════════ -->
+<section class="slide" id="s4b" style="background:#161616;position:relative;">
+  <div style="position:absolute;top:0;left:0;width:6px;height:100%;background:#0f62fe;"></div>
+  <div style="position:absolute;top:0;right:0;width:45%;height:100%;background-image:linear-gradient(rgba(15,98,254,.04)1px,transparent 1px),linear-gradient(90deg,rgba(15,98,254,.04)1px,transparent 1px);background-size:44px 44px;"></div>
+  <div class="slide-num">04B / 07</div>
+  <div style="position:relative;z-index:2;">
+    <div style="font-size:11px;font-weight:700;color:#0f62fe;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;">Backup Tooling</div>
+    <h2 style="font-size:36px;font-weight:700;color:#fff;margin-bottom:8px;">What is Grover's Script?</h2>
+    <div style="width:52px;height:3px;background:#0f62fe;margin-bottom:40px;"></div>
+    <div style="display:flex;gap:24px;align-items:flex-start;">
+
+      <!-- Left — what it does -->
+      <div style="flex:1.1;display:flex;flex-direction:column;gap:14px;">
+        <div style="font-size:11px;font-weight:700;color:#393939;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px;">What It Does</div>
+
+        <div style="display:flex;gap:16px;align-items:flex-start;background:rgba(255,255,255,.06);border-radius:4px;padding:20px 22px;border-left:4px solid #0f62fe;">
+          <div style="font-size:26px;flex-shrink:0;margin-top:2px;">✍️</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:6px;">Writes Directly to distbkup2</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.7;">Instead of saving the mksysb image or savevg backup to the client's local machine first, Grover's script writes the backup directly into the NIM Master (distbkup2). This eliminates the need for local storage on the client and removes the manual SCP transfer step entirely.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:16px;align-items:flex-start;background:rgba(255,255,255,.06);border-radius:4px;padding:20px 22px;border-left:4px solid #4589ff;">
+          <div style="font-size:26px;flex-shrink:0;margin-top:2px;">📅</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:6px;">Scheduling Built In</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.7;">Grover's script supports automated scheduling, allowing backups to be set to run at the desired time (e.g. Friday nights) without manual intervention — keeping the backup process consistent and hands-off.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right — build protection -->
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px;">Build Protection Logic</div>
+
+        <div style="background:rgba(255,255,255,.06);border-radius:4px;padding:22px 24px;border-top:3px solid #24a148;">
+          <div style="color:#42be65;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;">Smart Freeze &amp; Resume</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <div style="width:26px;height:26px;background:#0f62fe;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0;">1</div>
+              <div style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.6;">A backup is scheduled and starts to run on the client</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <div style="width:26px;height:26px;background:#0f62fe;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0;">2</div>
+              <div style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.6;">If a build is actively running, the script <strong style="color:#fff;">freezes the backup</strong> and takes a snapshot of the current system state</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <div style="width:26px;height:26px;background:#0f62fe;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0;">3</div>
+              <div style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.6;">The build is allowed to <strong style="color:#fff;">finish running uninterrupted</strong> — no disruption to active work</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <div style="width:26px;height:26px;background:#24a148;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0;">4</div>
+              <div style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.6;">Once the build completes, the script <strong style="color:#42be65;">resumes and continues the backup</strong> from where it left off</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:rgba(15,98,254,.15);border-radius:4px;padding:16px 20px;border:1px solid rgba(15,98,254,.3);">
+          <div style="font-size:12px;font-weight:700;color:#4589ff;margin-bottom:6px;">Key Benefit</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.6;">Grover's script ensures that backups never interrupt active builds, and builds never block backups — the two processes coexist safely and automatically.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     SLIDE 5 — RECOVERY PROCESS
+══════════════════════════════════ -->
+<section class="slide" id="s5">
+  <div class="bar"></div>
+  <div class="grid"></div>
+  <div class="slide-num">05 / 07</div>
+  <div class="ey">Phase 2</div>
+  <h2>Recovery Process</h2>
+  <div class="div"></div>
+  <div class="steps">
+    <div class="rs">
+      <div class="rn">01</div>
+      <h4>Resolve Hardware First</h4>
+      <p>If the disaster involves a hardware failure, the physical issue must be resolved before recovery can begin. If the original hardware cannot be repaired immediately, recovery can be performed on an alternate LPAR with similar disk capacity and resources.</p>
+      <div class="arrow">→</div>
+    </div>
+    <div class="rs">
+      <div class="rn">02</div>
+      <h4>Allocate NIM Resources</h4>
+      <p>On the NIM Master, use <strong style="color:#4589ff">smitty nim</strong> to allocate the three required resources — the mksysb image, the SPOT resource, and the client definition — to the target client. Confirm allocation with: <strong style="color:#4589ff">lsnim -l &lt;clientname&gt;</strong></p>
+      <div class="arrow">→</div>
+    </div>
+    <div class="rs">
+      <div class="rn">03</div>
+      <h4>Boot Client into SMS Menu</h4>
+      <p>Reboot the client system and stop it at the SMS (System Management Services) menu — the low-level boot interface. From SMS, select the Ethernet adapter as the boot device. If the adapter name is unknown, identify it by MAC address.</p>
+      <div class="arrow">→</div>
+    </div>
+    <div class="rs">
+      <div class="rn">04</div>
+      <h4>Network Boot &amp; Install</h4>
+      <p>The client boots over the network and connects to the NIM Master. It pulls down the allocated mksysb and SPOT resources. The system boots into the AIX installation menu where the operator selects the target disk. Installation proceeds automatically.</p>
+      <div class="arrow">→</div>
+    </div>
+    <div class="rs done">
+      <div class="rn">05</div>
+      <h4>Verify &amp; Confirm Recovery</h4>
+      <p>After installation completes: verify the system boots correctly, confirm all applications and services function as expected, validate data integrity, and ensure the NIM client definition matches the restored system.</p>
+      <div class="complete-badge">✓ Recovery Complete</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     SLIDE 6 — NIM RESOURCES
+══════════════════════════════════ -->
+<section class="slide" id="s6">
+  <div class="slide-num">06 / 07</div>
+  <div class="left">
+    <div class="c1"></div>
+    <div class="c2"></div>
+    <div class="ey">NIM Deep Dive</div>
+    <h2>Three Resources</h2>
+    <h3>Every Recovery Needs</h3>
+    <div class="div"></div>
+    <p>Before a recovery can begin, the NIM Master must have all three resources created and correctly allocated to the target client. Without all three in place, the network installation will not proceed. These resources are created from the backup image transferred by the client.</p>
+  </div>
+  <div class="right">
+    <div class="res r1">
+      <div class="rnum">1</div>
+      <div>
+        <h4>mksysb Resource</h4>
+        <p>Points directly to the mksysb backup file that was written to the NIM Master via Grover's script. This is the core OS image used during restoration — it contains everything needed to reinstall the operating system to its exact pre-disaster state, including all system configuration.</p>
+        <div class="det">Created from: the client's mksysb file written to NIM Master via Grover's script</div>
+      </div>
+    </div>
+    <div class="res r2">
+      <div class="rnum">2</div>
+      <div>
+        <h4>SPOT Resource (Shared Product Object Tree)</h4>
+        <p>Extracted directly from the mksysb resource. The SPOT provides the /usr filesystem environment that the client needs in order to perform a network boot. Without a SPOT resource, the client has no environment to boot into and the NIM installation cannot start.</p>
+        <div class="det">Created from: the mksysb resource — Step 1 must be completed first</div>
+      </div>
+    </div>
+    <div class="res r3">
+      <div class="rnum">3</div>
+      <div>
+        <h4>NIM Client Definition</h4>
+        <p>Identifies the target system to the NIM Master. Includes the MAC address, CPU ID, and machine ID (obtained by running <strong>uname -m</strong> on the client). The more accurate and complete this definition, the smoother the communication between NIM Master and the client during recovery.</p>
+        <div class="det">Verify all resources allocated correctly: lsnim -l &lt;clientname&gt;</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     SLIDE 7 — SUMMARY
+══════════════════════════════════ -->
+<section class="slide" id="s7">
+  <div class="slide-num dark">07 / 07</div>
+  <div class="ey">Summary</div>
+  <h2>What This Plan Delivers</h2>
+  <div class="div"></div>
+  <div class="cols">
+    <div class="col-l">
+      <div class="clbl">What Is Now In Place</div>
+      <div class="chk"><div class="icon">✅</div><span>Weekly savevg backups every Friday night — scheduled via CRON, runs automatically off-hours</span></div>
+      <div class="chk"><div class="icon">✅</div><span>Monthly mksysb for full OS recovery — rootvg is fully covered for all 4 clients</span></div>
+      <div class="chk"><div class="icon">✅</div><span>1-month retention policy — 4 rolling weekly backups per client, oldest rotated out automatically</span></div>
+      <div class="chk"><div class="icon">✅</div><span>NIM Master (distbkup2) centrally stores all backup images — disk capacity confirmed sufficient</span></div>
+      <div class="chk"><div class="icon">✅</div><span>5-step recovery procedure — hardware → allocate resources → SMS boot → network install → verify</span></div>
+      <div class="chk"><div class="icon">✅</div><span>Full documentation covering all 4 client servers, owned and maintained by John</span></div>
+    </div>
+    <div class="col-r">
+      <div class="rto">
+        <div class="rey">Recovery Targets</div>
+        <div class="metrics">
+          <div class="m">
+            <div class="big">RTO</div>
+            <div class="sub">Recovery Time Objective</div>
+            <div class="val">Immediate</div>
+          </div>
+          <div class="rto-div"></div>
+          <div class="m">
+            <div class="big">RPO</div>
+            <div class="sub">Recovery Point Objective</div>
+            <div class="val">&lt; 1 Week</div>
+          </div>
+        </div>
+      </div>
+      <div class="next">
+        <div class="nlbl">Next Steps</div>
+        <div class="ni"><div class="nn">1</div><span>Confirm full server inventory and client owners with John</span></div>
+        <div class="ni"><div class="nn">2</div><span>Schedule and run first 4 backups (Week 1) via CRON</span></div>
+        <div class="ni"><div class="nn">3</div><span>Check NIM Master disk usage after Week 2 (8 images total)</span></div>
+        <div class="ni"><div class="nn">4</div><span>Perform trial reinstall to prove backups are actually recoverable</span></div>
+        <div class="ni"><div class="nn">5</div><span>Build BoB automation workflows for scheduling and disk monitoring</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- end deck -->
+
+<!-- ── FIXED NAVIGATION BAR ── -->
+<nav class="nav-bar">
+  <a href="#s1">01 Cover</a>
+  <span class="sep">|</span>
+  <a href="#s2">02 Why</a>
+  <span class="sep">|</span>
+  <a href="#s3">03 Infrastructure</a>
+  <span class="sep">|</span>
+  <a href="#s4">04 Backup</a>
+  <span class="sep">|</span>
+  <a href="#s4b">04B Grover's Script</a>
+  <span class="sep">|</span>
+  <a href="#s5">05 Recovery</a>
+  <span class="sep">|</span>
+  <a href="#s6">06 NIM Resources</a>
+  <span class="sep">|</span>
+  <a href="#s7">07 Summary</a>
+</nav>
+
+</body>
+</html>
